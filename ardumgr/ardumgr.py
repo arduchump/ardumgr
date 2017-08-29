@@ -6,6 +6,7 @@ import re
 from pkg_resources import parse_version
 from pathlib import Path
 from collections import OrderedDict
+from .platform import Platform
 
 
 class ArduMgr(object):
@@ -53,6 +54,12 @@ class ArduMgr(object):
     def platforms(self):
         return self._platform_dirs.keys()
 
+    def get_platform(self, id_):
+        p = Platform(id_, dict())
+
+        # TODO: Need to fill the configurations from platform config files
+        return p
+
     def _get_hardware_dir(self):
         return self._home_path / 'hardware'
 
@@ -62,5 +69,5 @@ class ArduMgr(object):
     def _get_tools_dir(self):
         return self._home_path / 'hardware' / 'tools'
 
-    def _get_platform_dir(self, platform):
-        return self._platform_dirs[platform]
+    def _get_platform_dir(self, id_):
+        return self._platform_dirs[id_]
