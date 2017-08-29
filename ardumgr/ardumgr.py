@@ -3,7 +3,7 @@
 """Main module."""
 
 import re
-import packaging.version
+from pkg_resources import parse_version
 from pathlib import Path
 from collections import OrderedDict
 
@@ -23,7 +23,7 @@ class ArduMgr(object):
         self._runtime_cfg = OrderedDict()
 
         if not self._is_before_v1_5_0:
-            with revision_file_path.open("rb") as revision_file:
+            with revision_file_path.open() as revision_file:
                 # The Arduino installation version is 1.5+, which includes
                 # information about the IDE run-time configuration.
                 match = re.search(
@@ -31,8 +31,8 @@ class ArduMgr(object):
                     revision_file.read(),
                     re.VERBOSE | re.MULTILINE)
                 version_text = match.group('version')
-                if (packaging.version.parse(version_text) <
-                        packaging.version.parse('1.5.0')):
+                if (parse_version(version_text) <
+                        parse_version('1.5.0')):
                     self._is_before_v1_5_0 = True
 
                 self._runtime_cfg['runtime'] = {
@@ -41,3 +41,27 @@ class ArduMgr(object):
                         'version': version_text.replace('.', '_')
                     }
                 }
+
+        # Search platform dirs
+        self._platform_dirs = dict()
+        if self._is_before_v1_5_0:
+            self._platform_dirs['avr'] = self._get_platform_workspace_dir()
+        else:
+            for adir in self._get_platform_workspace_dir().iterdir():
+                self._platform_dirs[adir.name] = adir
+
+    @property
+    def platforms(self):
+        return self._platform_dirs.keys()
+
+    def _get_hardware_dir(self):
+        return self._home_path / 'hardware'
+
+    def _get_platform_workspace_dir(self):
+        return self._home_path / 'hardware' / 'arduino'
+
+    def _get_tools_dir(self):
+        return self._home_path / 'hardware' / 'tools'
+
+    def _get_platform_dir(self, platform):
+        return self._platform_dirs[platform]
