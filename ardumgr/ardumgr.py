@@ -16,13 +16,13 @@ class ArduMgr(object):
         revision_file_path = (self._home_path / 'revisions.txt')
 
         # Check if the specified Arduino installation version is before 1.5.0
-        self._is_before_v1_5_0 = not revision_file_path.is_file()
+        self._is_old_style_dirs = not revision_file_path.is_file()
 
         # The Arduino installation version is 1.5.0, so there is no IDE
         # run-time configuration available.
         self._runtime_cfg = OrderedDict()
 
-        if not self._is_before_v1_5_0:
+        if not self._is_old_style_dirs:
             with revision_file_path.open() as revision_file:
                 # The Arduino installation version is 1.5+, which includes
                 # information about the IDE run-time configuration.
@@ -31,9 +31,8 @@ class ArduMgr(object):
                     revision_file.read(),
                     re.VERBOSE | re.MULTILINE)
                 version_text = match.group('version')
-                if (parse_version(version_text) <
-                        parse_version('1.5.0')):
-                    self._is_before_v1_5_0 = True
+                if parse_version(version_text) < parse_version('1.5.0'):
+                    self._is_old_style_dirs = True
 
                 self._runtime_cfg['runtime'] = {
                     'ide': {
@@ -44,7 +43,7 @@ class ArduMgr(object):
 
         # Search platform dirs
         self._platform_dirs = dict()
-        if self._is_before_v1_5_0:
+        if self._is_old_style_dirs:
             self._platform_dirs['avr'] = self._get_platform_workspace_dir()
         else:
             for adir in self._get_platform_workspace_dir().iterdir():
