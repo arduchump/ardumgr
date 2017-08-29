@@ -4,14 +4,15 @@
 """Console script for ardumgr."""
 
 import click
+from .ardumgr import ArduMgr
 
 
 @click.command()
-def main(args=None):
+@click.argument('home_path')
+def main(home_path):
     """Console script for ardumgr."""
-    click.echo("Replace this message by putting your code into "
-               "ardumgr.__main__.main")
-    click.echo("See click documentation at http://click.pocoo.org/")
+
+    am = ArduMgr(home_path)
 
 
 if __name__ == "__main__":
