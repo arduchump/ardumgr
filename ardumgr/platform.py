@@ -1,4 +1,6 @@
 from rabird.core.configparser import ConfigParser
+from collections import OrderedDict
+from pathlib import Path
 
 
 class Platform(object):
@@ -10,17 +12,19 @@ class Platform(object):
     def __init__(self, manager, id_):
         self._manager = manager
         self._id = id_
+        self._cfg = dict()
 
-        cfgparser = ConfigParser()
-        adir = manager._get_platform_dir(id_)
-        for file_path in adir.glob('*.txt'):
-            if not file_path.is_file():
-                continue
+        cfg_file_base_keys = [
+            ("platform.txt", None),
+            ("boards.txt", "boards"),
+            ("programmers.txt", "programmers"),
+        ]
 
-            with file_path.open() as afile:
-                cfgparser.readfp(afile)
-
-        self._cfg = dict(cfgparser.items(cfgparser.UNNAMED_SECTION))
+        for file_name, key in cfg_file_base_keys:
+            apath = (manager._get_platform_dir(id_) / file_name)
+            if apath.exists():
+                with apath.open() as afile:
+                    self._parse_cfg(afile, key)
 
     @property
     def id_(self):
@@ -29,3 +33,21 @@ class Platform(object):
     @property
     def cfg(self):
         return self._cfg
+
+    def _parse_cfg(self, fp, base_key=None):
+        cfgparser = ConfigParser()
+        cfgparser.readfp(fp)
+
+        if base_key is None:
+            base_key = ""
+        else:
+            base_key = base_key + "."
+
+        items = cfgparser.items(cfgparser.UNNAMED_SECTION)
+        for option, value in items:
+            # Filter all empty/comment options away
+            if (option.startswith(cfgparser._EMPTY_OPTION)
+                    or option.startswith(cfgparser._COMMENT_OPTION)):
+                continue
+
+            self._cfg["%s%s" % (base_key, option)] = value
