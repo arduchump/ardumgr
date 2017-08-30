@@ -1,4 +1,5 @@
 import re
+import string
 from rabird.core.configparser import ConfigParser
 
 
@@ -56,6 +57,27 @@ class Platform(object):
             names.append(matched.group(1))
 
         return names
+
+    def get_expanded(self, key):
+        text = self._cfg[key]
+
+        while True:
+            formatter = string.Formatter()
+            names = []
+            for _, field_name, _, _ in formatter.parse(text):
+                if field_name is None:
+                    continue
+
+                names.append(field_name)
+
+            if len(names) <= 0:
+                return text
+
+            # Search name matched values
+            kwargs = dict()
+            for name in names:
+                kwargs[name] = self._cfg[name]
+            text = formatter.format(**kwargs)
 
     def _parse_cfg(self, fp, base_key=None):
         cfgparser = ConfigParser()
