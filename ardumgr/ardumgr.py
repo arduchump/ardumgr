@@ -6,7 +6,7 @@ import re
 from pkg_resources import parse_version
 from pathlib import Path
 from collections import OrderedDict
-from .platform import Platform
+from .configs import Platform
 
 
 class ArduMgr(object):
