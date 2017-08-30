@@ -55,7 +55,7 @@ class ArduMgr(object):
         return self._platforms
 
     def get_platform(self, id_):
-        p = Platform(id_, dict())
+        p = Platform(self, id_)
 
         # TODO: Need to fill the configurations from platform config files
         return p

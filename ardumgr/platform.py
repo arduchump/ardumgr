@@ -1,3 +1,5 @@
+from rabird.core.configparser import ConfigParser
+
 
 class Platform(object):
     """
@@ -5,9 +7,20 @@ class Platform(object):
     platform.
     """
 
-    def __init__(self, id_, cfg):
+    def __init__(self, manager, id_):
+        self._manager = manager
         self._id = id_
-        self._cfg = cfg
+
+        cfgparser = ConfigParser()
+        adir = manager._get_platform_dir(id_)
+        for file_path in adir.glob('*.txt'):
+            if not file_path.is_file():
+                continue
+
+            with file_path.open() as afile:
+                cfgparser.readfp(afile)
+
+        self._cfg = dict(cfgparser.items(cfgparser.UNNAMED_SECTION))
 
     @property
     def id_(self):

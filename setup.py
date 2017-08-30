@@ -10,12 +10,13 @@ with open('README.rst') as readme_file, open('HISTORY.rst') as history_file:
 
 requirements = [
     'click>=6.0',
-    # TODO: put package requirements here
+    'rabird.core>=3.1.2',
 ]
 
 setup_requirements = [
     'pytest-runner',
-    # TODO(starofrainnight): put setup requirements (distutils extensions, etc.) here
+    # TODO(starofrainnight): put setup requirements (distutils extensions,
+    # etc.) here
 ]
 
 test_requirements = [
