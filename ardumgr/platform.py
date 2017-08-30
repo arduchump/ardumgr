@@ -33,13 +33,29 @@ class Platform(object):
     def cfg(self):
         return self._cfg
 
-    def filter_keys(self, pattern):
-        keys = list()
-        for k in self._cfg.keys():
-            if re.match(pattern, k) is not None:
-                keys.append(k)
+    @property
+    def boards(self):
+        names = []
+        for akey in self._cfg.keys():
+            matched = re.match(r"boards\.(\w+)\.name", akey)
+            if matched is None:
+                continue
 
-        return keys
+            names.append(matched.group(1))
+
+        return names
+
+    @property
+    def programmers(self):
+        names = []
+        for akey in self._cfg.keys():
+            matched = re.match(r"programmers\.(\w+)\.name", akey)
+            if matched is None:
+                continue
+
+            names.append(matched.group(1))
+
+        return names
 
     def _parse_cfg(self, fp, base_key=None):
         cfgparser = ConfigParser()
