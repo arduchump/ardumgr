@@ -43,16 +43,16 @@ class ArduMgr(object):
                 }
 
         # Search platform dirs
-        self._platform_dirs = dict()
+        self._platforms = list()
         if self._is_old_style_dirs:
-            self._platform_dirs['avr'] = self._get_platform_workspace_dir()
+            self._platforms.append('avr')
         else:
-            for adir in self._get_platform_workspace_dir().iterdir():
-                self._platform_dirs[adir.name] = adir
+            for adir in self._get_platform_base_dir().iterdir():
+                self._platforms.append(adir.name)
 
     @property
     def platforms(self):
-        return self._platform_dirs.keys()
+        return self._platforms
 
     def get_platform(self, id_):
         p = Platform(id_, dict())
@@ -60,14 +60,26 @@ class ArduMgr(object):
         # TODO: Need to fill the configurations from platform config files
         return p
 
+    def _get_compatible_dir(self, path, platform_id):
+        path = Path(path)
+        if self._is_old_style_dirs:
+            return path
+        else:
+            return path / str(platform_id)
+
     def _get_hardware_dir(self):
         return self._home_path / 'hardware'
 
-    def _get_platform_workspace_dir(self):
+    def _get_platform_base_dir(self):
         return self._home_path / 'hardware' / 'arduino'
 
-    def _get_tools_dir(self):
+    def _get_tools_base_dir(self):
         return self._home_path / 'hardware' / 'tools'
 
-    def _get_platform_dir(self, id_):
-        return self._platform_dirs[id_]
+    def _get_tools_dir(self, platform_id):
+        return self._get_compatible_dir(
+            self._get_tools_base_dir(), platform_id)
+
+    def _get_platform_dir(self, platform_id):
+        return self._get_compatible_dir(
+            self._get_platform_base_dir(), platform_id)
