@@ -1,3 +1,4 @@
+import re
 from rabird.core.configparser import ConfigParser
 from collections import OrderedDict
 from pathlib import Path
@@ -33,6 +34,14 @@ class Platform(object):
     @property
     def cfg(self):
         return self._cfg
+
+    def filter_keys(self, pattern):
+        keys = list()
+        for k in self._cfg.keys():
+            if re.match(pattern, k) is not None:
+                keys.append(k)
+
+        return keys
 
     def _parse_cfg(self, fp, base_key=None):
         cfgparser = ConfigParser()
