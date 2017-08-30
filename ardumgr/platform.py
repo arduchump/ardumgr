@@ -1,7 +1,5 @@
 import re
 from rabird.core.configparser import ConfigParser
-from collections import OrderedDict
-from pathlib import Path
 
 
 class Platform(object):
