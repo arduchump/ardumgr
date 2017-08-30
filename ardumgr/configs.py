@@ -46,6 +46,14 @@ class Platform(object):
     def tools(self):
         return self._get_children("tools")
 
+    def get_board_supported_cpus(self, board):
+        """
+        @return A list of supported cpu id will be return. If empty list
+        returned, it means there have a default cpu and without any other
+        options.
+        """
+        return self._get_children("boards.%s.menu.cpu" % board)
+
     def get_expanded(self, key):
         text = self._cfg[key]
 
