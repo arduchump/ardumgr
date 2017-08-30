@@ -1,7 +1,7 @@
 
 class Platform(object):
     """
-    A readonly platform object contained all informations related to specific
+    A readonly class contained all informations related to specific
     platform.
     """
 
