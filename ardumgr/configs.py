@@ -58,6 +58,18 @@ class Platform(object):
 
         return names
 
+    @property
+    def tools(self):
+        names = []
+        for akey in self._cfg.keys():
+            matched = re.match(r"tools\.(\w+)\.path", akey)
+            if matched is None:
+                continue
+
+            names.append(matched.group(1))
+
+        return list(set(names))
+
     def get_expanded(self, key):
         text = self._cfg[key]
 
