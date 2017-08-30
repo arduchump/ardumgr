@@ -36,39 +36,15 @@ class Platform(object):
 
     @property
     def boards(self):
-        names = []
-        for akey in self._cfg.keys():
-            matched = re.match(r"boards\.(\w+)\.name", akey)
-            if matched is None:
-                continue
-
-            names.append(matched.group(1))
-
-        return names
+        return self._get_children("boards")
 
     @property
     def programmers(self):
-        names = []
-        for akey in self._cfg.keys():
-            matched = re.match(r"programmers\.(\w+)\.name", akey)
-            if matched is None:
-                continue
-
-            names.append(matched.group(1))
-
-        return names
+        return self._get_children("programmers")
 
     @property
     def tools(self):
-        names = []
-        for akey in self._cfg.keys():
-            matched = re.match(r"tools\.(\w+)\.path", akey)
-            if matched is None:
-                continue
-
-            names.append(matched.group(1))
-
-        return list(set(names))
+        return self._get_children("tools")
 
     def get_expanded(self, key):
         text = self._cfg[key]
@@ -90,6 +66,21 @@ class Platform(object):
             for name in names:
                 kwargs[name] = self._cfg[name]
             text = formatter.format(**kwargs)
+
+    def _get_children(self, key_prefix):
+        names = []
+        key_prefix = key_prefix.replace(".", r"\.")
+        pattern = r"%s\.(\w+)" % key_prefix
+        regexp = re.compile(pattern)
+
+        for akey in self._cfg.keys():
+            matched = regexp.match(akey)
+            if matched is None:
+                continue
+
+            names.append(matched.group(1))
+
+        return list(set(names))
 
     def _parse_cfg(self, fp, base_key=None):
         cfgparser = ConfigParser()
