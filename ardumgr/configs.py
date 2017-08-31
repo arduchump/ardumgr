@@ -47,8 +47,17 @@ class ConfigsMgr(dict):
 
                 self["%s%s" % (base_key, option)] = value
 
+    def get_overrided(self, key):
+        runtime_os = self["runtime.os"]
+        runtime_os_specific_key = "%s.%s" % (key, runtime_os)
+
+        try:
+            return self[runtime_os_specific_key]
+        except:
+            return self[key]
+
     def get_expanded(self, key):
-        text = self[key]
+        text = self.get_overrided(key)
 
         while True:
             formatter = string.Formatter()
@@ -65,7 +74,7 @@ class ConfigsMgr(dict):
             # Search name matched values
             kwargs = dict()
             for name in names:
-                kwargs[name] = self[name]
+                kwargs[name] = self.get_overrided(name)
             text = formatter.format(**kwargs)
 
     def get_subtree(self, key_prefix):
