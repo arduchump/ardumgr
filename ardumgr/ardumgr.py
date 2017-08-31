@@ -7,6 +7,7 @@ from pkg_resources import parse_version
 from pathlib import Path
 from collections import OrderedDict
 from rabird.core.configparser import ConfigParser
+from . import configs
 from .configs import Platform
 
 
@@ -30,19 +31,7 @@ class ArduMgr(object):
 
         # Load runtime preferences
         preferences_path = self.user_dir / "preferences.txt"
-        if preferences_path.exists():
-            with preferences_path.open() as fp:
-                cfgparser = ConfigParser()
-                cfgparser.readfp(fp)
-
-                items = cfgparser.items(cfgparser.UNNAMED_SECTION)
-                for option, value in items:
-                    # Filter all empty/comment options away
-                    if (option.startswith(cfgparser._EMPTY_OPTION)
-                            or option.startswith(cfgparser._COMMENT_OPTION)):
-                        continue
-
-                    self._runtime_cfg[option] = value
+        self._runtime_cfg.update(configs.load_cfgs(preferences_path))
 
         # Search platform dirs
         self._platforms = list()
