@@ -149,21 +149,3 @@ class Platform(object):
             names.append(matched.group(1))
 
         return list(set(names))
-
-    def _parse_cfg(self, fp, base_key=None):
-        cfgparser = ConfigParser()
-        cfgparser.readfp(fp)
-
-        if base_key is None:
-            base_key = ""
-        else:
-            base_key = base_key + "."
-
-        items = cfgparser.items(cfgparser.UNNAMED_SECTION)
-        for option, value in items:
-            # Filter all empty/comment options away
-            if (option.startswith(cfgparser._EMPTY_OPTION)
-                    or option.startswith(cfgparser._COMMENT_OPTION)):
-                continue
-
-            self._cfgs["%s%s" % (base_key, option)] = value
