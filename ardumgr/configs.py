@@ -75,6 +75,25 @@ class Platform(object):
                 kwargs[name] = self._cfg[name]
             text = formatter.format(**kwargs)
 
+    def _get_subtree(self, key_prefix):
+        names = []
+        key_prefix = key_prefix.replace(".", r"\.")
+        pattern = r"%s\.(.*)" % key_prefix
+        regexp = re.compile(pattern)
+
+        for akey in self._cfg.keys():
+            matched = regexp.match(akey)
+            if matched is None:
+                continue
+
+            if ((matched.group(1) == "name")
+                    or (matched.group(1).startswith("menu."))):
+                continue
+
+            names.append(matched.group(1))
+
+        return list(set(names))
+
     def _get_children(self, key_prefix):
         names = []
         key_prefix = key_prefix.replace(".", r"\.")
