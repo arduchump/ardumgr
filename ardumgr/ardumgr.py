@@ -16,8 +16,8 @@ class ArduMgr(object):
         self._home_path = Path(str(home_path))
 
         # Check if the specified Arduino installation version is before 1.5.0
-        version_text = self._get_arduino_version()
-        self._is_old_style_dirs = (parse_version(self._get_arduino_version())
+        version_text = self.version
+        self._is_old_style_dirs = (parse_version(self.version)
                                    < parse_version('1.5.0'))
 
         # The Arduino installation version is 1.5.0, so there is no IDE
@@ -56,26 +56,8 @@ class ArduMgr(object):
     def platforms(self):
         return self._platforms
 
-    def get_platform(self, id_):
-        p = Platform(self, id_)
-
-        # TODO: Need to fill the configurations from platform config files
-        return p
-
-    def get_user_dir(self):
-        user_dir = Path.home() / ".arduino"
-
-        # After 1.6.10, user dir changed from .arduino to .arduino15
-        #
-        # Reference :
-        # https://build.opensuse.org/package/view_file/CrossToolchain:avr/Arduino/Arduino.changes?expand=1
-        version_text = self._get_arduino_version()
-        if parse_version(version_text) >= parse_version('1.6.10'):
-            user_dir = Path.home() / ".arduino15"
-
-        return user_dir
-
-    def _get_arduino_version(self):
+    @property
+    def version(self):
         version = "1.0.0"  # Default
 
         while True:
@@ -104,6 +86,25 @@ class ArduMgr(object):
             break
 
         return version
+
+    def get_platform(self, id_):
+        p = Platform(self, id_)
+
+        # TODO: Need to fill the configurations from platform config files
+        return p
+
+    def get_user_dir(self):
+        user_dir = Path.home() / ".arduino"
+
+        # After 1.6.10, user dir changed from .arduino to .arduino15
+        #
+        # Reference :
+        # https://build.opensuse.org/package/view_file/CrossToolchain:avr/Arduino/Arduino.changes?expand=1
+        version_text = self.version
+        if parse_version(version_text) >= parse_version('1.6.10'):
+            user_dir = Path.home() / ".arduino15"
+
+        return user_dir
 
     def _get_compatible_dir(self, path, platform_id):
         path = Path(path)
