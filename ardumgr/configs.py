@@ -61,21 +61,20 @@ class ConfigsMgr(dict):
 
         while True:
             formatter = string.Formatter()
-            names = []
-            for _, field_name, _, _ in formatter.parse(text):
-                if field_name is None:
-                    continue
+            has_field = False
+            snippets = []
+            for literal_text, field_name, _, _ in formatter.parse(text):
+                if literal_text:
+                    snippets.append(literal_text)
 
-                names.append(field_name)
+                if field_name:
+                    snippets.append(self.get_overrided(field_name))
+                    has_field = True
 
-            if len(names) <= 0:
+            if not has_field:
                 return text
 
-            # Search name matched values
-            kwargs = dict()
-            for name in names:
-                kwargs[name] = self.get_overrided(name)
-            text = formatter.format(**kwargs)
+            text = "".join(snippets)
 
     def get_subtree(self, key_prefix):
         subtree = dict()
