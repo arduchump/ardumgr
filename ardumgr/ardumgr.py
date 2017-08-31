@@ -15,38 +15,27 @@ class ArduMgr(object):
     def __init__(self, home_path):
         self._home_path = Path(str(home_path))
 
-        revision_file_path = (self._home_path / 'revisions.txt')
-
         # Check if the specified Arduino installation version is before 1.5.0
-        self._is_old_style_dirs = not revision_file_path.is_file()
+        version_text = self._get_arduino_version()
+        self._is_old_style_dirs = (parse_version(self._get_arduino_version())
+                                   < parse_version('1.5.0'))
 
         # The Arduino installation version is 1.5.0, so there is no IDE
         # run-time configuration available.
         self._runtime_cfg = OrderedDict()
 
+        self._runtime_cfg['runtime.ide.path'] = self._home_path
+        self._runtime_cfg['runtime.ide.version'] = (
+            version_text.replace('.', '_'))
+
         arduino_settings_dir = Path.home() / ".arduino"
-        if not self._is_old_style_dirs:
-            with revision_file_path.open() as revision_file:
-                # The Arduino installation version is 1.5+, which includes
-                # information about the IDE run-time configuration.
-                match = re.search(
-                    r'^ARDUINO\s+(?P<version>\d+\.\d+\.\d+)',
-                    revision_file.read(),
-                    re.VERBOSE | re.MULTILINE)
-                version_text = match.group('version')
-                if parse_version(version_text) < parse_version('1.5.0'):
-                    self._is_old_style_dirs = True
 
-                self._runtime_cfg['runtime.ide.path'] = self._home_path
-                self._runtime_cfg[
-                    'runtime.ide.version'] = version_text.replace('.', '_')
-
-                # After 1.6.10, user dir changed from .arduino to .arduino15
-                #
-                # Reference :
-                # https://build.opensuse.org/package/view_file/CrossToolchain:avr/Arduino/Arduino.changes?expand=1
-                if parse_version(version_text) >= parse_version('1.6.10'):
-                    arduino_settings_dir = Path.home() / ".arduino15"
+        # After 1.6.10, user dir changed from .arduino to .arduino15
+        #
+        # Reference :
+        # https://build.opensuse.org/package/view_file/CrossToolchain:avr/Arduino/Arduino.changes?expand=1
+        if parse_version(version_text) >= parse_version('1.6.10'):
+            arduino_settings_dir = Path.home() / ".arduino15"
 
         # Load runtime preferences
         preferences_path = arduino_settings_dir / "preferences.txt"
@@ -81,6 +70,36 @@ class ArduMgr(object):
 
         # TODO: Need to fill the configurations from platform config files
         return p
+
+    def _get_arduino_version(self):
+        version = "1.0.0"  # Default
+
+        while True:
+            revision_file_path = self._home_path / "lib/version.txt"
+            if revision_file_path.exists():
+                with revision_file_path.open() as revision_file:
+                    match = re.search(
+                        r'^[^:]+:(?P<version>[\d\.]+)',
+                        revision_file.read(),
+                        re.VERBOSE | re.MULTILINE)
+                    if match is not None:
+                        version = match.group('version')
+
+            revision_file_path = (self._home_path / 'revisions.txt')
+            if revision_file_path.exists():
+                with revision_file_path.open() as revision_file:
+                    # The Arduino installation version is 1.5+, which includes
+                    # information about the IDE run-time configuration.
+                    match = re.search(
+                        r'^ARDUINO\s+(?P<version>\d+\.\d+\.\d+)',
+                        revision_file.read(),
+                        re.VERBOSE | re.MULTILINE)
+                    if match is not None:
+                        version = match.group('version')
+
+            break
+
+        return version
 
     def _get_compatible_dir(self, path, platform_id):
         path = Path(path)
