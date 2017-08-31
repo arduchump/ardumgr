@@ -28,17 +28,8 @@ class ArduMgr(object):
         self._runtime_cfg['runtime.ide.version'] = (
             version_text.replace('.', '_'))
 
-        arduino_settings_dir = Path.home() / ".arduino"
-
-        # After 1.6.10, user dir changed from .arduino to .arduino15
-        #
-        # Reference :
-        # https://build.opensuse.org/package/view_file/CrossToolchain:avr/Arduino/Arduino.changes?expand=1
-        if parse_version(version_text) >= parse_version('1.6.10'):
-            arduino_settings_dir = Path.home() / ".arduino15"
-
         # Load runtime preferences
-        preferences_path = arduino_settings_dir / "preferences.txt"
+        preferences_path = self.get_user_dir() / "preferences.txt"
         if preferences_path.exists():
             with preferences_path.open() as fp:
                 cfgparser = ConfigParser()
@@ -70,6 +61,19 @@ class ArduMgr(object):
 
         # TODO: Need to fill the configurations from platform config files
         return p
+
+    def get_user_dir(self):
+        user_dir = Path.home() / ".arduino"
+
+        # After 1.6.10, user dir changed from .arduino to .arduino15
+        #
+        # Reference :
+        # https://build.opensuse.org/package/view_file/CrossToolchain:avr/Arduino/Arduino.changes?expand=1
+        version_text = self._get_arduino_version()
+        if parse_version(version_text) >= parse_version('1.6.10'):
+            user_dir = Path.home() / ".arduino15"
+
+        return user_dir
 
     def _get_arduino_version(self):
         version = "1.0.0"  # Default
