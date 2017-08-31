@@ -33,6 +33,30 @@ class ArduMgr(object):
         preferences_path = self.user_dir / "preferences.txt"
         self._runtime_cfgs.update(configs.load_cfgs(preferences_path))
 
+        # Analyse runtime tools paths
+        user_tools_dir = self.user_dir / "packages" / "arduino" / "tools"
+        for tool_base_dir in user_tools_dir.iterdir():
+            if not tool_base_dir.is_dir():
+                continue
+
+            # Included multi-versions tool
+            for adir in tool_base_dir.iterdir():
+                if not adir.is_dir():
+                    continue
+
+                value = str(adir)
+
+                key = 'runtime.tools.%s.path' % tool_base_dir.name
+                self._runtime_cfgs[key] = value
+
+                key = 'runtime.tools.%s-%s.path' % (
+                    tool_base_dir.name, adir.name)
+                self._runtime_cfgs[key] = value
+
+                key = 'runtime.tools.arduino-%s-%s.path' % (
+                    tool_base_dir.name, adir.name)
+                self._runtime_cfgs[key] = value
+
         # Search platform dirs
         self._platforms = list()
         if self._is_old_style_dirs:
