@@ -6,6 +6,7 @@ import re
 from pkg_resources import parse_version
 from pathlib import Path
 from collections import OrderedDict
+from rabird.core.configparser import ConfigParser
 from .configs import Platform
 
 
@@ -23,6 +24,7 @@ class ArduMgr(object):
         # run-time configuration available.
         self._runtime_cfg = OrderedDict()
 
+        arduino_settings_dir = Path.home() / ".arduino"
         if not self._is_old_style_dirs:
             with revision_file_path.open() as revision_file:
                 # The Arduino installation version is 1.5+, which includes
@@ -38,6 +40,29 @@ class ArduMgr(object):
                 self._runtime_cfg['runtime.ide.path'] = self._home_path
                 self._runtime_cfg[
                     'runtime.ide.version'] = version_text.replace('.', '_')
+
+                # After 1.6.10, user dir changed from .arduino to .arduino15
+                #
+                # Reference :
+                # https://build.opensuse.org/package/view_file/CrossToolchain:avr/Arduino/Arduino.changes?expand=1
+                if parse_version(version_text) >= parse_version('1.6.10'):
+                    arduino_settings_dir = Path.home() / ".arduino15"
+
+        # Load runtime preferences
+        preferences_path = arduino_settings_dir / "preferences.txt"
+        if preferences_path.exists():
+            with preferences_path.open() as fp:
+                cfgparser = ConfigParser()
+                cfgparser.readfp(fp)
+
+                items = cfgparser.items(cfgparser.UNNAMED_SECTION)
+                for option, value in items:
+                    # Filter all empty/comment options away
+                    if (option.startswith(cfgparser._EMPTY_OPTION)
+                            or option.startswith(cfgparser._COMMENT_OPTION)):
+                        continue
+
+                    self._runtime_cfg[option] = value
 
         # Search platform dirs
         self._platforms = list()
