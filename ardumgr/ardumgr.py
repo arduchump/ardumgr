@@ -6,9 +6,6 @@ import re
 import sys
 from pkg_resources import parse_version
 from pathlib import Path
-from collections import OrderedDict
-from rabird.core.configparser import ConfigParser
-from . import configs
 from .configs import ConfigsMgr, Platform
 
 
