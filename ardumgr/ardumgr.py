@@ -35,12 +35,9 @@ class ArduMgr(object):
                 if parse_version(version_text) < parse_version('1.5.0'):
                     self._is_old_style_dirs = True
 
-                self._runtime_cfg['runtime'] = {
-                    'ide': {
-                        'path': self._home_path,
-                        'version': version_text.replace('.', '_')
-                    }
-                }
+                self._runtime_cfg['runtime.ide.path'] = self._home_path
+                self._runtime_cfg[
+                    'runtime.ide.version'] = version_text.replace('.', '_')
 
         # Search platform dirs
         self._platforms = list()
