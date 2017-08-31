@@ -23,7 +23,7 @@ class ArduMgr(object):
 
         # The Arduino installation version is 1.5.0, so there is no IDE
         # run-time configuration available.
-        self._runtime_cfg = OrderedDict()
+        self._runtime_cfg = dict()
 
         self._runtime_cfg['runtime.ide.path'] = self._home_path
         self._runtime_cfg['runtime.ide.version'] = (
