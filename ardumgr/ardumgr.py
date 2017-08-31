@@ -23,15 +23,15 @@ class ArduMgr(object):
 
         # The Arduino installation version is 1.5.0, so there is no IDE
         # run-time configuration available.
-        self._runtime_cfg = dict()
+        self._runtime_cfgs = dict()
 
-        self._runtime_cfg['runtime.ide.path'] = self._home_path
-        self._runtime_cfg['runtime.ide.version'] = (
+        self._runtime_cfgs['runtime.ide.path'] = self._home_path
+        self._runtime_cfgs['runtime.ide.version'] = (
             version_text.replace('.', '_'))
 
         # Load runtime preferences
         preferences_path = self.user_dir / "preferences.txt"
-        self._runtime_cfg.update(configs.load_cfgs(preferences_path))
+        self._runtime_cfgs.update(configs.load_cfgs(preferences_path))
 
         # Search platform dirs
         self._platforms = list()

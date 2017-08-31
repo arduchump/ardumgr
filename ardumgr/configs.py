@@ -55,7 +55,7 @@ class Platform(object):
     def __init__(self, manager, id_):
         self._manager = manager
         self._id = id_
-        self._cfgs = copy.deepcopy(manager._runtime_cfg)
+        self._cfgs = copy.deepcopy(manager._runtime_cfgs)
 
         cfg_file_base_keys = [
             ("platform.txt", None),
