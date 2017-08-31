@@ -3,6 +3,7 @@
 """Main module."""
 
 import re
+import sys
 from pkg_resources import parse_version
 from pathlib import Path
 from collections import OrderedDict
@@ -57,6 +58,14 @@ class ArduMgr(object):
                     tool_base_dir.name, adir.name)
                 self._runtime_cfgs[key] = value
 
+        # Add runtime os config
+        key = "runtime.os"
+        self._runtime_cfgs[key] = "linux"
+        if sys.platform == "win32":
+            self._runtime_cfgs[key] = "windows"
+        elif sys.platform == "darwin":
+            self._runtime_cfgs[key] = "macosx"
+
         # Search platform dirs
         self._platforms = list()
         if self._is_old_style_dirs:
@@ -64,6 +73,16 @@ class ArduMgr(object):
         else:
             for adir in self._get_platform_base_dir().iterdir():
                 self._platforms.append(adir.name)
+
+    @property
+    def oss(self):
+        """
+        Return a series OS (OSs)
+
+        Reference: https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5-3rd-party-Hardware-specification#global-predefined-properties
+        """
+
+        return ["linux", "windows", "macosx"]
 
     @property
     def platforms(self):
