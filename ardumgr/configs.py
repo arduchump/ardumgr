@@ -102,6 +102,10 @@ class ConfigsMgr(dict):
         regexp = re.compile(pattern)
 
         for akey in self.keys():
+            if akey == "boards.menu.cpu":
+                # Removed unused child item from boards.txt
+                continue
+
             matched = regexp.match(akey)
             if matched is None:
                 continue
