@@ -58,6 +58,10 @@ class ArduMgr(object):
 
     @property
     def version(self):
+        """
+        Detect Arduino IDE's version, return 1.0.0 if failed.
+        """
+
         version = "1.0.0"  # Default
 
         while True:
