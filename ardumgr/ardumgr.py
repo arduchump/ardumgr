@@ -29,7 +29,7 @@ class ArduMgr(object):
             version_text.replace('.', '_'))
 
         # Load runtime preferences
-        preferences_path = self.get_user_dir() / "preferences.txt"
+        preferences_path = self.user_dir / "preferences.txt"
         if preferences_path.exists():
             with preferences_path.open() as fp:
                 cfgparser = ConfigParser()
@@ -91,13 +91,8 @@ class ArduMgr(object):
 
         return version
 
-    def get_platform(self, id_):
-        p = Platform(self, id_)
-
-        # TODO: Need to fill the configurations from platform config files
-        return p
-
-    def get_user_dir(self):
+    @property
+    def user_dir(self):
         user_dir = Path.home() / ".arduino"
 
         # After 1.6.10, user dir changed from .arduino to .arduino15
@@ -109,6 +104,12 @@ class ArduMgr(object):
             user_dir = Path.home() / ".arduino15"
 
         return user_dir
+
+    def get_platform(self, id_):
+        p = Platform(self, id_)
+
+        # TODO: Need to fill the configurations from platform config files
+        return p
 
     def _get_compatible_dir(self, path, platform_id):
         path = Path(path)
