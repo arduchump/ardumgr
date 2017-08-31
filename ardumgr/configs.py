@@ -78,12 +78,12 @@ class ConfigsMgr(dict):
             text = formatter.format(**kwargs)
 
     def get_subtree(self, key_prefix):
-        names = []
+        subtree = dict()
         key_prefix = key_prefix.replace(".", r"\.")
         pattern = r"%s\.(.*)" % key_prefix
         regexp = re.compile(pattern)
 
-        for akey in self.keys():
+        for akey, value in self.items():
             matched = regexp.match(akey)
             if matched is None:
                 continue
@@ -92,9 +92,9 @@ class ConfigsMgr(dict):
                     or (matched.group(1).startswith("menu."))):
                 continue
 
-            names.append(matched.group(1))
+            subtree[matched.group(1)] = value
 
-        return list(set(names))
+        return subtree
 
     def get_children(self, key_prefix):
         names = []
