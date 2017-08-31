@@ -47,6 +47,61 @@ class ConfigsMgr(dict):
 
                 self["%s%s" % (base_key, option)] = value
 
+    def get_expanded(self, key):
+        text = self[key]
+
+        while True:
+            formatter = string.Formatter()
+            names = []
+            for _, field_name, _, _ in formatter.parse(text):
+                if field_name is None:
+                    continue
+
+                names.append(field_name)
+
+            if len(names) <= 0:
+                return text
+
+            # Search name matched values
+            kwargs = dict()
+            for name in names:
+                kwargs[name] = self[name]
+            text = formatter.format(**kwargs)
+
+    def get_subtree(self, key_prefix):
+        names = []
+        key_prefix = key_prefix.replace(".", r"\.")
+        pattern = r"%s\.(.*)" % key_prefix
+        regexp = re.compile(pattern)
+
+        for akey in self.keys():
+            matched = regexp.match(akey)
+            if matched is None:
+                continue
+
+            if ((matched.group(1) == "name")
+                    or (matched.group(1).startswith("menu."))):
+                continue
+
+            names.append(matched.group(1))
+
+        return list(set(names))
+
+    def get_children(self, key_prefix):
+        names = []
+        key_prefix = key_prefix.replace(".", r"\.")
+        pattern = r"%s\.(\w+)" % key_prefix
+        regexp = re.compile(pattern)
+
+        for akey in self.keys():
+            matched = regexp.match(akey)
+            if matched is None:
+                continue
+
+            names.append(matched.group(1))
+
+        return list(set(names))
+
 
 class Platform(object):
     """
@@ -79,15 +134,15 @@ class Platform(object):
 
     @property
     def boards(self):
-        return self._get_children("boards")
+        return self._cfgs.get_children("boards")
 
     @property
     def programmers(self):
-        return self._get_children("programmers")
+        return self._cfgs.get_children("programmers")
 
     @property
     def tools(self):
-        return self._get_children("tools")
+        return self._cfgs.get_children("tools")
 
     def get_board_supported_cpus(self, board):
         """
@@ -95,59 +150,4 @@ class Platform(object):
         returned, it means there have a default cpu and without any other
         options.
         """
-        return self._get_children("boards.%s.menu.cpu" % board)
-
-    def get_expanded(self, key):
-        text = self._cfgs[key]
-
-        while True:
-            formatter = string.Formatter()
-            names = []
-            for _, field_name, _, _ in formatter.parse(text):
-                if field_name is None:
-                    continue
-
-                names.append(field_name)
-
-            if len(names) <= 0:
-                return text
-
-            # Search name matched values
-            kwargs = dict()
-            for name in names:
-                kwargs[name] = self._cfgs[name]
-            text = formatter.format(**kwargs)
-
-    def _get_subtree(self, key_prefix):
-        names = []
-        key_prefix = key_prefix.replace(".", r"\.")
-        pattern = r"%s\.(.*)" % key_prefix
-        regexp = re.compile(pattern)
-
-        for akey in self._cfgs.keys():
-            matched = regexp.match(akey)
-            if matched is None:
-                continue
-
-            if ((matched.group(1) == "name")
-                    or (matched.group(1).startswith("menu."))):
-                continue
-
-            names.append(matched.group(1))
-
-        return list(set(names))
-
-    def _get_children(self, key_prefix):
-        names = []
-        key_prefix = key_prefix.replace(".", r"\.")
-        pattern = r"%s\.(\w+)" % key_prefix
-        regexp = re.compile(pattern)
-
-        for akey in self._cfgs.keys():
-            matched = regexp.match(akey)
-            if matched is None:
-                continue
-
-            names.append(matched.group(1))
-
-        return list(set(names))
+        return self._cfgs.get_children("boards.%s.menu.cpu" % board)
