@@ -122,6 +122,9 @@ class Platform(object):
         self._id = id_
         self._cfgs = copy.deepcopy(manager._runtime_cfgs)
 
+        self._cfgs["runtime.platform.path"] = str(
+            manager._get_platform_dir(id_))
+
         cfg_file_base_keys = [
             ("platform.txt", None),
             ("boards.txt", "boards"),
