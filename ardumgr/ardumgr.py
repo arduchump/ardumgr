@@ -9,7 +9,7 @@ from pathlib import Path
 from collections import OrderedDict
 from rabird.core.configparser import ConfigParser
 from . import configs
-from .configs import Platform
+from .configs import ConfigsMgr, Platform
 
 
 class ArduMgr(object):
@@ -24,7 +24,7 @@ class ArduMgr(object):
 
         # The Arduino installation version is 1.5.0, so there is no IDE
         # run-time configuration available.
-        self._runtime_cfgs = dict()
+        self._runtime_cfgs = ConfigsMgr()
 
         self._runtime_cfgs['runtime.ide.path'] = self._home_path
         self._runtime_cfgs['runtime.ide.version'] = (
@@ -32,7 +32,7 @@ class ArduMgr(object):
 
         # Load runtime preferences
         preferences_path = self.user_dir / "preferences.txt"
-        self._runtime_cfgs.update(configs.load_cfgs(preferences_path))
+        self._runtime_cfgs.load(preferences_path)
 
         # Analyse runtime tools paths
         user_tools_dir = self.user_dir / "packages" / "arduino" / "tools"

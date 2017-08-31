@@ -6,44 +6,46 @@ from pathlib import Path
 from rabird.core.configparser import ConfigParser
 
 
-def load_cfgs(fp, base_key=None):
-    @contextmanager
-    def fp_close(fp_tuple):
-        try:
-            yield fp_tuple[0]
-        finally:
-            if fp_tuple[1]:
-                fp_tuple[0].close()
+class ConfigsMgr(dict):
 
-    is_open_by_us = False
-    if isinstance(fp, str) or isinstance(fp, Path):
-        fp = Path(fp)
-        if not fp.exists():
-            return dict()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-        fp = fp.open()
-        is_open_by_us = True
+    def load(self, fp, base_key=None):
+        @contextmanager
+        def fp_close(fp_tuple):
+            try:
+                yield fp_tuple[0]
+            finally:
+                if fp_tuple[1]:
+                    fp_tuple[0].close()
 
-    if base_key is None:
-        base_key = ""
-    else:
-        base_key = base_key + "."
+        is_open_by_us = False
+        if isinstance(fp, str) or isinstance(fp, Path):
+            fp = Path(fp)
+            if not fp.exists():
+                return dict()
 
-    with fp_close((fp, is_open_by_us)) as fp:
-        cfgparser = ConfigParser()
-        cfgparser.readfp(fp)
+            fp = fp.open()
+            is_open_by_us = True
 
-        cfgs = dict()
-        items = cfgparser.items(cfgparser.UNNAMED_SECTION)
-        for option, value in items:
-            # Filter all empty/comment options away
-            if (option.startswith(cfgparser._EMPTY_OPTION)
-                    or option.startswith(cfgparser._COMMENT_OPTION)):
-                continue
+        if base_key is None:
+            base_key = ""
+        else:
+            base_key = base_key + "."
 
-            cfgs["%s%s" % (base_key, option)] = value
+        with fp_close((fp, is_open_by_us)) as fp:
+            cfgparser = ConfigParser()
+            cfgparser.readfp(fp)
 
-        return cfgs
+            items = cfgparser.items(cfgparser.UNNAMED_SECTION)
+            for option, value in items:
+                # Filter all empty/comment options away
+                if (option.startswith(cfgparser._EMPTY_OPTION)
+                        or option.startswith(cfgparser._COMMENT_OPTION)):
+                    continue
+
+                self["%s%s" % (base_key, option)] = value
 
 
 class Platform(object):
@@ -65,7 +67,7 @@ class Platform(object):
 
         for file_name, key in cfg_file_base_keys:
             apath = (manager._get_platform_dir(id_) / file_name)
-            self._cfgs.update(load_cfgs(apath, key))
+            self._cfgs.load(apath, key)
 
     @property
     def id_(self):
