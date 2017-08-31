@@ -54,7 +54,7 @@ class Platform(object):
     def __init__(self, manager, id_):
         self._manager = manager
         self._id = id_
-        self._cfg = dict()
+        self._cfgs = dict()
 
         cfg_file_base_keys = [
             ("platform.txt", None),
@@ -64,15 +64,15 @@ class Platform(object):
 
         for file_name, key in cfg_file_base_keys:
             apath = (manager._get_platform_dir(id_) / file_name)
-            self._cfg.update(load_cfgs(apath, key))
+            self._cfgs.update(load_cfgs(apath, key))
 
     @property
     def id_(self):
         return self._id
 
     @property
-    def cfg(self):
-        return self._cfg
+    def cfgs(self):
+        return self._cfgs
 
     @property
     def boards(self):
@@ -95,7 +95,7 @@ class Platform(object):
         return self._get_children("boards.%s.menu.cpu" % board)
 
     def get_expanded(self, key):
-        text = self._cfg[key]
+        text = self._cfgs[key]
 
         while True:
             formatter = string.Formatter()
@@ -112,7 +112,7 @@ class Platform(object):
             # Search name matched values
             kwargs = dict()
             for name in names:
-                kwargs[name] = self._cfg[name]
+                kwargs[name] = self._cfgs[name]
             text = formatter.format(**kwargs)
 
     def _get_subtree(self, key_prefix):
@@ -121,7 +121,7 @@ class Platform(object):
         pattern = r"%s\.(.*)" % key_prefix
         regexp = re.compile(pattern)
 
-        for akey in self._cfg.keys():
+        for akey in self._cfgs.keys():
             matched = regexp.match(akey)
             if matched is None:
                 continue
@@ -140,7 +140,7 @@ class Platform(object):
         pattern = r"%s\.(\w+)" % key_prefix
         regexp = re.compile(pattern)
 
-        for akey in self._cfg.keys():
+        for akey in self._cfgs.keys():
             matched = regexp.match(akey)
             if matched is None:
                 continue
@@ -165,4 +165,4 @@ class Platform(object):
                     or option.startswith(cfgparser._COMMENT_OPTION)):
                 continue
 
-            self._cfg["%s%s" % (base_key, option)] = value
+            self._cfgs["%s%s" % (base_key, option)] = value
