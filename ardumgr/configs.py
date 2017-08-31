@@ -1,5 +1,6 @@
 import re
 import string
+import copy
 from contextlib import contextmanager
 from pathlib import Path
 from rabird.core.configparser import ConfigParser
@@ -54,7 +55,7 @@ class Platform(object):
     def __init__(self, manager, id_):
         self._manager = manager
         self._id = id_
-        self._cfgs = dict()
+        self._cfgs = copy.deepcopy(manager._runtime_cfg)
 
         cfg_file_base_keys = [
             ("platform.txt", None),
