@@ -32,7 +32,7 @@ class Programmer(object):
 
         self._platform = platform
         self._cfgs = ConfigsMgr()
-        self._cfgs.link_to(platform.cfgs)
+        self._cfgs.base_on(platform.cfgs)
 
         self._programmer = self._cfgs["ardumgr.programmer"]
         self._board = self._cfgs["ardumgr.board"]
