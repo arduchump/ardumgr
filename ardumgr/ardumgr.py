@@ -34,6 +34,7 @@ class ArduMgr(object):
         self._runtime_cfgs.update(preferences)
         self._runtime_cfgs['runtime.ide.version'] = (
             version_text.replace('.', '_'))
+        self._runtime_cfgs['target_package'] = "arduino"
 
         # Load runtime preferences
         preferences_path = self.user_dir / "preferences.txt"
