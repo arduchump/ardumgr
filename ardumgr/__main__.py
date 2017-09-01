@@ -5,6 +5,7 @@
 
 import click
 import yaml
+from pathlib import Path
 from .ardumgr import ArduMgr
 from .programmer import Programmer
 from .configs import Platform
@@ -32,13 +33,35 @@ def print_table(alist, callback):
 
 @click.group()
 @click.option('-c', '--config', type=click.File('r'), default=None)
+@click.option('-p', '--preference', multiple=True, default=None)
 @click.pass_context
-def main(ctx, config):
+def main(ctx, config, preference):
     """Console script for ardumgr."""
 
-    ctx.obj["config"] = yaml.load(config)
+    configs = dict()
+    if config:
+        configs.update(yaml.load(config))
 
-    manager = ArduMgr(ctx.obj["config"]["home"])
+    if preference:
+        for value in preference:
+            parts = value.split("=", 1)
+            if len(parts) != 2:
+                raise click.BadOptionUsage(
+                    "Wrong format of preference : %s" % value)
+
+            configs[parts[0].strip()] = parts[1].strip()
+
+    if "runtime.ide.path" not in configs:
+        raise click.BadOptionUsage(
+            'Preference "runtime.ide.path" undefined! '
+            'It must be defined by "-p" option or contained in config file.')
+
+    ide_path = configs["runtime.ide.path"].strip()
+    if (not ide_path) or (not Path(ide_path).exists()):
+        raise click.BadOptionUsage(
+            "Arduino IDE path not found: %s" % ide_path)
+
+    manager = ArduMgr(configs)
     ctx.obj["manager"] = manager
 
 

@@ -10,8 +10,18 @@ from .configs import ConfigsMgr, Platform
 
 class ArduMgr(object):
 
-    def __init__(self, home_path):
-        self._home_path = Path(str(home_path))
+    def __init__(self, preferences):
+        """
+        Initialize ArduMgr object
+
+        @arg preferences Predefined preferences for Arduino IDE. You must
+        define these preferences at least:
+
+            runtime.ide.path
+
+        """
+
+        self._home_path = Path(str(preferences["runtime.ide.path"]))
 
         # Check if the specified Arduino installation version is before 1.5.0
         version_text = self.version
@@ -21,8 +31,7 @@ class ArduMgr(object):
         # The Arduino installation version is 1.5.0, so there is no IDE
         # run-time configuration available.
         self._runtime_cfgs = ConfigsMgr()
-
-        self._runtime_cfgs['runtime.ide.path'] = self._home_path
+        self._runtime_cfgs.update(preferences)
         self._runtime_cfgs['runtime.ide.version'] = (
             version_text.replace('.', '_'))
 
