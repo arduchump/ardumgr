@@ -32,27 +32,31 @@ class ArduMgr(object):
 
         # Analyse runtime tools paths
         user_tools_dir = self.user_dir / "packages" / "arduino" / "tools"
-        for tool_base_dir in user_tools_dir.iterdir():
-            if not tool_base_dir.is_dir():
-                continue
-
-            # Included multi-versions tool
-            for adir in tool_base_dir.iterdir():
-                if not adir.is_dir():
+        try:
+            for tool_base_dir in user_tools_dir.iterdir():
+                if not tool_base_dir.is_dir():
                     continue
 
-                value = str(adir)
+                # Included multi-versions tool
+                for adir in tool_base_dir.iterdir():
+                    if not adir.is_dir():
+                        continue
 
-                key = 'runtime.tools.%s.path' % tool_base_dir.name
-                self._runtime_cfgs[key] = value
+                    value = str(adir)
 
-                key = 'runtime.tools.%s-%s.path' % (
-                    tool_base_dir.name, adir.name)
-                self._runtime_cfgs[key] = value
+                    key = 'runtime.tools.%s.path' % tool_base_dir.name
+                    self._runtime_cfgs[key] = value
 
-                key = 'runtime.tools.arduino-%s-%s.path' % (
-                    tool_base_dir.name, adir.name)
-                self._runtime_cfgs[key] = value
+                    key = 'runtime.tools.%s-%s.path' % (
+                        tool_base_dir.name, adir.name)
+                    self._runtime_cfgs[key] = value
+
+                    key = 'runtime.tools.arduino-%s-%s.path' % (
+                        tool_base_dir.name, adir.name)
+                    self._runtime_cfgs[key] = value
+        except FileNotFoundError:
+            # User tools paths not found at pre15 style directories
+            pass
 
         # Add runtime os config
         key = "runtime.os"
