@@ -36,7 +36,6 @@ def print_table(alist, callback):
 def main(ctx, config):
     """Console script for ardumgr."""
 
-    ctx.obj["config"] = 12
     ctx.obj["config"] = yaml.load(config)
 
     manager = ArduMgr(ctx.obj["config"]["home"])
