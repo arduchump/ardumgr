@@ -4,12 +4,29 @@ import copy
 from contextlib import contextmanager
 from pathlib import Path
 from rabird.core.configparser import ConfigParser
+from collections import KeysView, ItemsView, ValuesView
+
+
+class ConfigsMgrKeys(KeysView):
+    pass
+
+
+class ConfigsMgrItems(ItemsView):
+    pass
+
+
+class ConfigsMgrValues(ValuesView):
+    pass
 
 
 class ConfigsMgr(dict):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._link = None
+
+    def link_to(self, other_mgr):
+        self._link = other_mgr
 
     def load(self, fp, base_key=None):
         @contextmanager
@@ -114,6 +131,52 @@ class ConfigsMgr(dict):
 
         return list(set(names))
 
+    def keys(self):
+        return ConfigsMgrKeys(self)
+
+    def items(self):
+        return ConfigsMgrItems(self)
+
+    def values(self):
+        return ConfigsMgrValues(self)
+
+    def __getitem__(self, name):
+        if self._link:
+            try:
+                return super().__getitem__(name)
+            except:
+                return self._link[name]
+        else:
+            return super().__getitem__(name)
+
+    def __contains__(self, item):
+        if self._link:
+            if not super().__contains__(item):
+                return item in self._link
+
+            return False
+        else:
+            return super().__contains__(item)
+
+    def __iter__(self):
+        if self._link:
+            def mixin_iter(self_keys, self_iter, link_iter):
+                current_it = self_iter
+                for akey in current_it:
+                    yield akey
+
+                current_it = link_iter
+                for akey in current_it:
+                    if akey in self_keys:
+                        continue
+
+                    yield akey
+
+            return mixin_iter(
+                super().keys(), super().__iter__(), iter(self._link))
+        else:
+            return super().__iter__()
+
 
 class Platform(object):
     """
@@ -123,8 +186,9 @@ class Platform(object):
 
     def __init__(self, manager, id_):
         self._manager = manager
-        self._id = id_
-        self._cfgs = copy.deepcopy(manager._runtime_cfgs)
+        self._id = id
+        self._cfgs = ConfigsMgr()
+        self._cfgs.link_to(manager._runtime_cfgs)
 
         self._cfgs["runtime.platform.path"] = str(
             manager._get_platform_dir(id_))

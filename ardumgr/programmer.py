@@ -1,5 +1,6 @@
 import copy
 from .exceptions import ArduMgrError
+from .configs import ConfigsMgr
 
 
 class Programmer(object):
@@ -29,19 +30,20 @@ class Programmer(object):
         serial.port=/dev/ttyUSB0
         """
 
-        self._platform = copy.deepcopy(platform)
-        platform = self._platform  # Use new created platform
+        self._platform = platform
+        self._cfgs = ConfigsMgr()
+        self._cfgs.link_to(platform.cfgs)
 
-        self._programmer = platform.cfgs["ardumgr.programmer"]
-        self._board = platform.cfgs["ardumgr.board"]
-        self._cpu = platform.cfgs["ardumgr.cpu"]
-        self._serial_port = platform.cfgs["ardumgr.serial.port"]
+        self._programmer = self._cfgs["ardumgr.programmer"]
+        self._board = self._cfgs["ardumgr.board"]
+        self._cpu = self._cfgs["ardumgr.cpu"]
+        self._serial_port = self._cfgs["ardumgr.serial.port"]
 
         # Convert preferences to Arduino IDE required format
-        platform.cfgs["programmer"] = "arduino:%s" % self._programmer
-        platform.cfgs["board"] = self._board
-        platform.cfgs["custom_cpu"] = "%s_%s" % (self._board, self._cpu)
-        platform.cfgs["serial.port"] = self._serial_port
+        self._cfgs["programmer"] = "arduino:%s" % self._programmer
+        self._cfgs["board"] = self._board
+        self._cfgs["custom_cpu"] = "%s_%s" % (self._board, self._cpu)
+        self._cfgs["serial.port"] = self._serial_port
 
         # Check if cpu related to specfic board
         cpus = platform.get_board_supported_cpus(self._board)
@@ -52,26 +54,28 @@ class Programmer(object):
                         self._board, cpus))
             elif self._cpu not in cpus:
                 raise ArduMgrError(
-                    "Board \"%s\" don't support cpu \"%s\"!" % (self._board, self._cpu))
+                    "Board \"%s\" don't support cpu \"%s\"!" % (
+                        self._board, self._cpu))
         elif self._cpu is not None:
             raise ArduMgrError(
-                "Board have a default cpu, don't specfic it yourself!" % self._board)
+                "Board have a default cpu, don't specfic it yourself!"
+                % self._board)
 
         # Specific serial port settings if it valid
         if self._serial_port:
-            platform.cfgs["serial.port"] = self._serial_port
+            self._cfgs["serial.port"] = self._serial_port
 
         # Find board and cpu specific configs and expand it to our platform
         key = "boards.%s" % self._board
-        subtree = platform.cfgs.get_subtree(key)
-        platform.cfgs.update(subtree)
+        subtree = self._cfgs.get_subtree(key)
+        self._cfgs.update(subtree)
 
         if self._cpu:
             key = "boards.%s.menu.cpu" % self._board
-            subtree = platform.cfgs.get_subtree(key)
-            platform.cfgs.update(subtree)
+            subtree = self._cfgs.get_subtree(key)
+            self._cfgs.update(subtree)
 
         # Expand upload tool configs
-        upload_tool = platform.cfgs["upload.tool"]
-        subtree = platform.cfgs.get_subtree("tools.%s" % upload_tool)
-        platform.cfgs.update(subtree)
+        upload_tool = self._cfgs["upload.tool"]
+        subtree = self._cfgs.get_subtree("tools.%s" % upload_tool)
+        self._cfgs.update(subtree)
