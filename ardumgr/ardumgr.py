@@ -142,12 +142,6 @@ class ArduMgr(object):
 
         return user_dir
 
-    def get_platform(self, id_):
-        p = Platform(self, id_)
-
-        # TODO: Need to fill the configurations from platform config files
-        return p
-
     @staticmethod
     def _version_to_int(version):
         """
