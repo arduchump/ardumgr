@@ -4,7 +4,6 @@
 
 import re
 import sys
-from pkg_resources import parse_version
 from pathlib import Path
 from .configs import ConfigsMgr, Platform
 
@@ -16,8 +15,8 @@ class ArduMgr(object):
 
         # Check if the specified Arduino installation version is before 1.5.0
         version_text = self.version
-        self._is_old_style_dirs = (parse_version(self.version)
-                                   < parse_version('1.5.0'))
+        self._is_old_style_dirs = (self._version_to_int(self.version)
+                                   < self._version_to_int('1.5.0'))
 
         # The Arduino installation version is 1.5.0, so there is no IDE
         # run-time configuration available.
@@ -88,21 +87,16 @@ class ArduMgr(object):
     @property
     def version(self):
         """
-        Detect Arduino IDE's version, return 1.0.0 if failed.
+        Detect Arduino IDE's version, return 1.0.5 if failed.
         """
 
-        version = "1.0.0"  # Default
+        version = "1.0.5"  # Default
 
         while True:
             revision_file_path = self._home_path / "lib/version.txt"
             if revision_file_path.exists():
                 with revision_file_path.open() as revision_file:
-                    match = re.search(
-                        r'^[^:]+:(?P<version>[\d\.]+)',
-                        revision_file.read(),
-                        re.VERBOSE | re.MULTILINE)
-                    if match is not None:
-                        version = match.group('version')
+                    version = revision_file.read().strip()
 
             revision_file_path = (self._home_path / 'revisions.txt')
             if revision_file_path.exists():
@@ -121,6 +115,15 @@ class ArduMgr(object):
         return version
 
     @property
+    def int_version(self):
+        """
+        Detect Arduino IDE's version, and convert it to a value, so that we
+        could easily to compare.
+        """
+
+        return self._version_to_int(self.version)
+
+    @property
     def user_dir(self):
         user_dir = Path.home() / ".arduino"
 
@@ -129,7 +132,8 @@ class ArduMgr(object):
         # Reference :
         # https://build.opensuse.org/package/view_file/CrossToolchain:avr/Arduino/Arduino.changes?expand=1
         version_text = self.version
-        if parse_version(version_text) >= parse_version('1.6.10'):
+        if (self._version_to_int(version_text)
+                >= self._version_to_int('1.6.10')):
             user_dir = Path.home() / ".arduino15"
 
         return user_dir
@@ -139,6 +143,40 @@ class ArduMgr(object):
 
         # TODO: Need to fill the configurations from platform config files
         return p
+
+    def _version_to_int(self, version):
+        """
+        Return version as int value
+
+        Samples:
+
+        0022 ->  22
+        0022ubuntu0.1 ->  22
+        0023 ->  23
+        1.0  -> 100
+        1.0.3  -> 103
+        1:1.0.5+dfsg2-2 -> 105
+        1.8.0 -> 10800
+        """
+
+        version = version.split('ubuntu')[0]
+        version = version.split(':')[-1]
+        version = version.split('+')[0]
+
+        if version.startswith('00'):  # <100
+            value = int(version[0:4])
+
+        elif '.' in version:  # >=100
+            parts = version.split('.')
+            parts += [0, 0, 0]
+            value = int(parts[0]) * 10000 + int(parts[1]) * 100 + int(parts[2])
+
+            if value < 10500:  # Version below 1.5.0
+                value = (int(parts[0]) * 100
+                         + int(parts[1]) * 10
+                         + int(parts[2]))
+
+        return value
 
     def _get_compatible_dir(self, path, platform_id):
         path = Path(path)
