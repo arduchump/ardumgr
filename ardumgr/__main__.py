@@ -164,5 +164,29 @@ def show_tools(ctx, platform):
 
     print_table(platform.tools, parse)
 
+
+@show.command(name="version")
+@click.pass_context
+def show_version(ctx):
+    """
+    Show Arduino IDE version
+    """
+
+    manager = ctx.obj["manager"]
+
+    click.echo(manager.version)
+
+
+@show.command(name="intversion")
+@click.pass_context
+def show_intversion(ctx):
+    """
+    Show Arduino IDE version (int value)
+    """
+
+    manager = ctx.obj["manager"]
+
+    click.echo(manager.int_version)
+
 if __name__ == "__main__":
     main(obj={})
