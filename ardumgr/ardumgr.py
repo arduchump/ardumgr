@@ -148,7 +148,8 @@ class ArduMgr(object):
         # TODO: Need to fill the configurations from platform config files
         return p
 
-    def _version_to_int(self, version):
+    @staticmethod
+    def _version_to_int(version):
         """
         Return version as int value
 
