@@ -201,6 +201,7 @@ def show_version(ctx):
 
 
 @show.command(name="intversion")
+@click.option("-p", "--platform", )
 @click.pass_context
 def show_intversion(ctx):
     """
@@ -210,6 +211,34 @@ def show_intversion(ctx):
     manager = ctx.obj["manager"]
 
     click.echo(manager.int_version)
+
+
+@show.command(name="pref")
+@click.argument("key")
+@click.pass_context
+def show_pref(ctx, key):
+    """
+    Show internal preferences (RAW)
+    """
+
+    manager = ctx.obj["manager"]
+    platform = Platform(manager, manager._runtime_cfgs["ardumgr.platform"])
+    programmer = Programmer(platform)
+    click.echo(programmer._platform.cfgs.get_overrided(key))
+
+
+@show.command(name="epref")
+@click.argument("key")
+@click.pass_context
+def show_epref(ctx, key):
+    """
+    Show internal preferences (EXPANDED)
+    """
+
+    manager = ctx.obj["manager"]
+    platform = Platform(manager, manager._runtime_cfgs["ardumgr.platform"])
+    programmer = Programmer(platform)
+    click.echo(programmer._platform.cfgs.get_expanded(key))
 
 if __name__ == "__main__":
     main(obj={})
