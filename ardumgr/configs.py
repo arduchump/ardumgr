@@ -139,6 +139,8 @@ class Platform(object):
             apath = (manager._get_platform_dir(id_) / file_name)
             self._cfgs.load(apath, key)
 
+        self._cfgs["target_platform"] = str(id_)
+
     @property
     def id_(self):
         return self._id
