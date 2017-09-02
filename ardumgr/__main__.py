@@ -202,7 +202,11 @@ def show_pref(ctx, key):
     manager = ctx.obj["manager"]
     platform = Platform(manager, manager._cfgs["ardumgr.platform"])
     programmer = Programmer(platform)
-    click.echo(programmer._cfgs.get_overrided(key))
+
+    try:
+        click.echo(programmer._cfgs.get_overrided(key))
+    except KeyError:
+        raise click.BadArgumentUsage('Key "%s" not found!' % key)
 
 
 @show.command(name="epref")
@@ -216,7 +220,11 @@ def show_epref(ctx, key):
     manager = ctx.obj["manager"]
     platform = Platform(manager, manager._cfgs["ardumgr.platform"])
     programmer = Programmer(platform)
-    click.echo(programmer._cfgs.get_expanded(key))
+
+    try:
+        click.echo(programmer._cfgs.get_expanded(key))
+    except KeyError:
+        raise click.BadArgumentUsage('Key "%s" not found!' % key)
 
 
 @show.command(name="prefs")
