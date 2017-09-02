@@ -30,16 +30,16 @@ class ArduMgr(object):
 
         # The Arduino installation version is 1.5.0, so there is no IDE
         # run-time configuration available.
-        self._runtime_cfgs = ConfigsMgr()
-        self._runtime_cfgs.update(preferences)
-        self._runtime_cfgs['runtime.ide.path'] = self._home_path
-        self._runtime_cfgs['runtime.ide.version'] = (
+        self._cfgs = ConfigsMgr()
+        self._cfgs.update(preferences)
+        self._cfgs['runtime.ide.path'] = self._home_path
+        self._cfgs['runtime.ide.version'] = (
             version_text.replace('.', '_'))
-        self._runtime_cfgs['target_package'] = "arduino"
+        self._cfgs['target_package'] = "arduino"
 
         # Load runtime preferences
         preferences_path = self.user_dir / "preferences.txt"
-        self._runtime_cfgs.load(preferences_path)
+        self._cfgs.load(preferences_path)
 
         # Analyse runtime tools paths
         user_tools_dir = self.user_dir / "packages" / "arduino" / "tools"
@@ -56,26 +56,26 @@ class ArduMgr(object):
                     value = str(adir)
 
                     key = 'runtime.tools.%s.path' % tool_base_dir.name
-                    self._runtime_cfgs[key] = value
+                    self._cfgs[key] = value
 
                     key = 'runtime.tools.%s-%s.path' % (
                         tool_base_dir.name, adir.name)
-                    self._runtime_cfgs[key] = value
+                    self._cfgs[key] = value
 
                     key = 'runtime.tools.arduino-%s-%s.path' % (
                         tool_base_dir.name, adir.name)
-                    self._runtime_cfgs[key] = value
+                    self._cfgs[key] = value
         except FileNotFoundError:
             # User tools paths not found at pre15 style directories
             pass
 
         # Add runtime os config
         key = "runtime.os"
-        self._runtime_cfgs[key] = "linux"
+        self._cfgs[key] = "linux"
         if sys.platform == "win32":
-            self._runtime_cfgs[key] = "windows"
+            self._cfgs[key] = "windows"
         elif sys.platform == "darwin":
-            self._runtime_cfgs[key] = "macosx"
+            self._cfgs[key] = "macosx"
 
         # Search platform dirs
         self._platforms = list()

@@ -188,7 +188,7 @@ class Platform(object):
         self._manager = manager
         self._id = id
         self._cfgs = ConfigsMgr()
-        self._cfgs.base_on(manager._runtime_cfgs)
+        self._cfgs.base_on(manager._cfgs)
 
         self._cfgs["runtime.platform.path"] = str(
             manager._get_platform_dir(id_))

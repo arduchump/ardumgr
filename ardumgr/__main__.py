@@ -221,7 +221,7 @@ def show_pref(ctx, key):
     """
 
     manager = ctx.obj["manager"]
-    platform = Platform(manager, manager._runtime_cfgs["ardumgr.platform"])
+    platform = Platform(manager, manager._cfgs["ardumgr.platform"])
     programmer = Programmer(platform)
     click.echo(programmer._platform.cfgs.get_overrided(key))
 
@@ -235,7 +235,7 @@ def show_epref(ctx, key):
     """
 
     manager = ctx.obj["manager"]
-    platform = Platform(manager, manager._runtime_cfgs["ardumgr.platform"])
+    platform = Platform(manager, manager._cfgs["ardumgr.platform"])
     programmer = Programmer(platform)
     click.echo(programmer._platform.cfgs.get_expanded(key))
 
