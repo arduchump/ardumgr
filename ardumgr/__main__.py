@@ -240,5 +240,18 @@ def show_epref(ctx, key):
     click.echo(programmer._platform.cfgs.get_expanded(key))
 
 
+@show.command(name="prefs")
+@click.pass_context
+def show_prefs(ctx):
+    """
+    Show all internal preferences (RAW)
+    """
+
+    manager = ctx.obj["manager"]
+    platform = Platform(manager, manager._cfgs["ardumgr.platform"])
+    programmer = Programmer(platform)
+    for k, v in programmer._cfgs.items():
+        click.echo("%s=%s" % (k, programmer._cfgs.get_overrided(k)))
+
 if __name__ == "__main__":
     main(obj={})
