@@ -167,28 +167,6 @@ def show_tools(ctx, platform):
     print_table(platform.tools, parse)
 
 
-@show.command(name="tools")
-@click.argument("platform")
-@click.pass_context
-def show_tools(ctx, platform):
-    """
-    Show supported tools on specific platform.
-    """
-
-    manager = ctx.obj["manager"]
-
-    if platform not in manager.platforms:
-        raise click.BadParameter("Unsupported platform!")
-
-    platform = Platform(manager, platform)
-
-    def parse(id_):
-        # Tools does not have a name
-        return id_, ""
-
-    print_table(platform.tools, parse)
-
-
 @show.command(name="version")
 @click.pass_context
 def show_version(ctx):
