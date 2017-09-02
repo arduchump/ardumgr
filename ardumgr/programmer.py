@@ -19,7 +19,7 @@ class Programmer(object):
         ardumgr.programmer=usbtinyisp
         ardumgr.board=mega
         ardumgr.cpu=atmega2560
-        ardumgr.serial.port=/dev/ttyUSB0
+        ardumgr.serial_port=/dev/ttyUSB0
 
         They will expanded to these preferences (Arduino IDE required):
 
@@ -36,7 +36,7 @@ class Programmer(object):
         self._programmer = self._cfgs["ardumgr.programmer"]
         self._board = self._cfgs["ardumgr.board"]
         self._cpu = self._cfgs["ardumgr.cpu"]
-        self._serial_port = self._cfgs["ardumgr.serial.port"]
+        self._serial_port = self._cfgs["ardumgr.serial_port"]
 
         # Convert preferences to Arduino IDE required format
         self._cfgs["programmer"] = "arduino:%s" % self._programmer
@@ -59,10 +59,6 @@ class Programmer(object):
             raise ArduMgrError(
                 "Board have a default cpu, don't specfic it yourself!"
                 % self._board)
-
-        # Specific serial port settings if it valid
-        if self._serial_port:
-            self._cfgs["serial.port"] = self._serial_port
 
         # Find board and cpu specific configs and expand it to our platform
         key = "boards.%s" % self._board
