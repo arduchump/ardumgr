@@ -41,6 +41,21 @@ class ArduMgr(object):
         preferences_path = self.user_dir / "preferences.txt"
         self._cfgs.load(preferences_path)
 
+        # Fixed IDE's settings that lead wrong text expanded to preferences
+        # just like "tools.avrdude.upload.pattern", etc.
+        self._cfgs['ardumgr.verbose'] = "true"
+        self._cfgs['ardumgr.verify'] = "true"
+
+        key = 'upload.verbose'
+        if key in self._cfgs:
+            self._cfgs['ardumgr.verbose'] = self._cfgs[key]
+            self._cfgs[key] = ""
+
+        key = 'upload.verify'
+        if key in self._cfgs:
+            self._cfgs['ardumgr.verify'] = self._cfgs[key]
+            self._cfgs[key] = ""
+
         # Analyse runtime tools paths
         user_tools_dir = self.user_dir / "packages" / "arduino" / "tools"
         try:
