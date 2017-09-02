@@ -66,7 +66,7 @@ class Programmer(object):
         self._cfgs.update(subtree)
 
         if self._cpu:
-            key = "boards.%s.menu.cpu" % self._board
+            key = "boards.%s.menu.cpu.%s" % (self._board, self._cpu)
             subtree = self._cfgs.get_subtree(key)
             self._cfgs.update(subtree)
 
