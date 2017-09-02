@@ -4,7 +4,7 @@ import copy
 from contextlib import contextmanager
 from pathlib import Path
 from rabird.core.configparser import ConfigParser
-from collections import KeysView, ItemsView, ValuesView
+from collections import KeysView, ItemsView, ValuesView, OrderedDict
 
 
 class ConfigsMgrKeys(KeysView):
@@ -19,7 +19,7 @@ class ConfigsMgrValues(ValuesView):
     pass
 
 
-class ConfigsMgr(dict):
+class ConfigsMgr(OrderedDict):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -41,7 +41,7 @@ class ConfigsMgr(dict):
         if isinstance(fp, str) or isinstance(fp, Path):
             fp = Path(fp)
             if not fp.exists():
-                return dict()
+                return OrderedDict()
 
             fp = fp.open()
             is_open_by_us = True
@@ -94,7 +94,7 @@ class ConfigsMgr(dict):
             text = "".join(snippets)
 
     def get_subtree(self, key_prefix):
-        subtree = dict()
+        subtree = OrderedDict()
         key_prefix = key_prefix.replace(".", r"\.")
         pattern = r"%s\.(.*)" % key_prefix
         regexp = re.compile(pattern)

@@ -6,6 +6,7 @@
 import click
 import yaml
 from pathlib import Path
+from collections import OrderedDict
 from .ardumgr import ArduMgr
 from .programmer import Programmer
 from .configs import Platform
@@ -38,7 +39,7 @@ def print_table(alist, callback):
 def main(ctx, config, preference):
     """Console script for ardumgr."""
 
-    configs = dict()
+    configs = OrderedDict()
     if config:
         configs.update(yaml.load(config))
 
