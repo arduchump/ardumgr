@@ -17,11 +17,11 @@ class ArduMgr(object):
         @arg preferences Predefined preferences for Arduino IDE. You must
         define these preferences at least:
 
-            runtime.ide.path
+            ardumgr.home_path
 
         """
 
-        self._home_path = Path(str(preferences["runtime.ide.path"]))
+        self._home_path = Path(str(preferences["ardumgr.home_path"]))
 
         # Check if the specified Arduino installation version is before 1.5.0
         version_text = self.version
@@ -32,6 +32,7 @@ class ArduMgr(object):
         # run-time configuration available.
         self._runtime_cfgs = ConfigsMgr()
         self._runtime_cfgs.update(preferences)
+        self._runtime_cfgs['runtime.ide.path'] = self._home_path
         self._runtime_cfgs['runtime.ide.version'] = (
             version_text.replace('.', '_'))
         self._runtime_cfgs['target_package'] = "arduino"

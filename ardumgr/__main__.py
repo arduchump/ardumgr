@@ -51,15 +51,15 @@ def main(ctx, config, preference):
 
             configs[parts[0].strip()] = parts[1].strip()
 
-    if "runtime.ide.path" not in configs:
+    if "ardumgr.home_path" not in configs:
         raise click.BadOptionUsage(
-            'Preference "runtime.ide.path" undefined! '
+            'Preference "ardumgr.home_path" undefined! '
             'It must be defined by "-p" option or contained in config file.')
 
-    ide_path = configs["runtime.ide.path"].strip()
-    if (not ide_path) or (not Path(ide_path).exists()):
+    home_path = configs["ardumgr.home_path"].strip()
+    if (not home_path) or (not Path(home_path).exists()):
         raise click.BadOptionUsage(
-            "Arduino IDE path not found: %s" % ide_path)
+            "Path not found: %s" % home_path)
 
     manager = ArduMgr(configs)
     ctx.obj["manager"] = manager
