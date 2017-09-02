@@ -1,4 +1,3 @@
-import copy
 from .exceptions import ArduMgrError
 from .configs import ConfigsMgr
 
