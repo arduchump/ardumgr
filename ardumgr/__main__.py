@@ -192,9 +192,9 @@ def show_intversion(ctx):
 
 
 @show.command(name="pref")
-@click.argument("key")
+@click.argument("name")
 @click.pass_context
-def show_pref(ctx, key):
+def show_pref(ctx, name):
     """
     Show internal preferences (RAW)
     """
@@ -204,15 +204,15 @@ def show_pref(ctx, key):
     programmer = Programmer(platform)
 
     try:
-        click.echo(programmer._cfgs.get_overrided(key))
+        click.echo(programmer._cfgs.get_overrided(name))
     except KeyError:
-        raise click.BadArgumentUsage('Key "%s" not found!' % key)
+        raise click.BadArgumentUsage('Preference "%s" not found!' % name)
 
 
 @show.command(name="epref")
-@click.argument("key")
+@click.argument("name")
 @click.pass_context
-def show_epref(ctx, key):
+def show_epref(ctx, name):
     """
     Show internal preferences (EXPANDED)
     """
@@ -222,9 +222,9 @@ def show_epref(ctx, key):
     programmer = Programmer(platform)
 
     try:
-        click.echo(programmer._cfgs.get_expanded(key))
+        click.echo(programmer._cfgs.get_expanded(name))
     except KeyError:
-        raise click.BadArgumentUsage('Key "%s" not found!' % key)
+        raise click.BadArgumentUsage('Preference "%s" not found!' % name)
 
 
 @show.command(name="prefs")
