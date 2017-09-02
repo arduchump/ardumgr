@@ -112,6 +112,7 @@ class ArduMgr(object):
             if revision_file_path.exists():
                 with revision_file_path.open() as revision_file:
                     version = revision_file.read().strip()
+                    break
 
             revision_file_path = (self._home_path / 'revisions.txt')
             if revision_file_path.exists():
@@ -124,6 +125,7 @@ class ArduMgr(object):
                         re.VERBOSE | re.MULTILINE)
                     if match is not None:
                         version = match.group('version')
+                        break
 
             break
 
