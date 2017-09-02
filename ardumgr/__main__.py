@@ -206,7 +206,7 @@ def show_pref(ctx, name):
     try:
         click.echo(programmer._cfgs.get_overrided(name))
     except KeyError:
-        raise click.BadArgumentUsage('Preference "%s" not found!' % name)
+        raise click.BadArgumentUsage("Preference '%s' not found!" % name)
 
 
 @show.command(name="epref")
@@ -222,9 +222,15 @@ def show_epref(ctx, name):
     programmer = Programmer(platform)
 
     try:
-        click.echo(programmer._cfgs.get_expanded(name))
+        overrided = programmer._cfgs.get_overrided(name)
     except KeyError:
-        raise click.BadArgumentUsage('Preference "%s" not found!' % name)
+        raise click.BadArgumentUsage("Preference '%s' not found!" % name)
+
+    try:
+        click.echo(programmer._cfgs.get_expanded(name))
+    except KeyError as e:
+        raise click.BadArgumentUsage("Replacement field %s not found! %s=%s" % (
+            str(e), name, overrided))
 
 
 @show.command(name="prefs")
