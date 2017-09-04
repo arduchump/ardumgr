@@ -66,6 +66,37 @@ def main(ctx, config, preference):
     ctx.obj["manager"] = manager
 
 
+@main.command()
+@click.argument("project_name")
+@click.argument("path")
+@click.pass_context
+def upload(ctx, project_name, path):
+    """
+    Upload by project
+    """
+
+    manager = ctx.obj["manager"]
+    platform = Platform(manager, manager._cfgs["ardumgr.platform"])
+    programmer = Programmer(platform)
+
+    programmer.upload(path, project_name)
+
+
+@main.command()
+@click.argument("path")
+@click.pass_context
+def uploadbin(ctx, path):
+    """
+    Upload generated binary file name
+    """
+
+    manager = ctx.obj["manager"]
+    platform = Platform(manager, manager._cfgs["ardumgr.platform"])
+    programmer = Programmer(platform)
+
+    programmer.upload_bin(path)
+
+
 @main.group()
 @click.pass_context
 def show(ctx):
@@ -245,6 +276,7 @@ def show_prefs(ctx):
     programmer = Programmer(platform)
     for k, v in programmer._cfgs.items():
         click.echo("%s=%s" % (k, programmer._cfgs.get_overrided(k)))
+
 
 if __name__ == "__main__":
     main(obj={})

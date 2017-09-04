@@ -1,3 +1,6 @@
+import subprocess
+import os.path
+from pathlib import Path
 from .exceptions import ArduMgrError
 from .configs import ConfigsMgr
 
@@ -74,3 +77,18 @@ class Programmer(object):
         upload_tool = self._cfgs["upload.tool"]
         subtree = self._cfgs.get_subtree("tools.%s" % upload_tool)
         self._cfgs.update(subtree)
+
+    def upload(self, build_path, project_name):
+        cfgs = ConfigsMgr()
+        cfgs.base_on(self._cfgs)
+
+        cfgs["build.path"] = build_path
+        cfgs["build.project_name"] = project_name
+
+        pattern = cfgs.get_expanded("upload.pattern")
+        print(pattern)
+        # return subprocess.call(pattern)
+
+    def upload_bin(self, binary_file_path):
+        path = Path(binary_file_path)
+        return self.upload(path.parent, os.path.splitext(path.name)[0])
