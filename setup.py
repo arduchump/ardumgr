@@ -10,7 +10,7 @@ with open('README.rst') as readme_file, open('HISTORY.rst') as history_file:
 
 requirements = [
     'click>=6.0',
-    'rabird.core>=3.1.3',
+    'rabird.core>=0.3.13',
     'PyYAML',
 ]
 
