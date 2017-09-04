@@ -78,16 +78,18 @@ class Programmer(object):
         subtree = self._cfgs.get_subtree("tools.%s" % upload_tool)
         self._cfgs.update(subtree)
 
-    def upload(self, build_path, project_name):
+    def _generate_upload_pattern(self, build_path, project_name):
         cfgs = ConfigsMgr()
         cfgs.base_on(self._cfgs)
 
         cfgs["build.path"] = build_path
         cfgs["build.project_name"] = project_name
 
-        pattern = cfgs.get_expanded("upload.pattern")
-        print(pattern)
-        # return subprocess.call(pattern)
+        return cfgs.get_expanded("upload.pattern")
+
+    def upload(self, build_path, project_name):
+        pattern = self._generate_upload_pattern(build_path, project_name)
+        return subprocess.call(pattern, shell=True)
 
     def upload_bin(self, binary_file_path):
         path = Path(binary_file_path)
