@@ -82,12 +82,15 @@ class Programmer(object):
         cfgs = ConfigsMgr()
         cfgs.base_on(self._cfgs)
 
-        cfgs["build.path"] = build_path
-        cfgs["build.project_name"] = project_name
+        if build_path is not None:
+            cfgs["build.path"] = build_path
+
+        if project_name is not None:
+            cfgs["build.project_name"] = project_name
 
         return cfgs.get_expanded("upload.pattern")
 
-    def upload(self, build_path, project_name):
+    def upload(self, build_path=None, project_name=None):
         pattern = self._generate_upload_pattern(build_path, project_name)
         return subprocess.call(pattern, shell=True)
 

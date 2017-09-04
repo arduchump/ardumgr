@@ -67,8 +67,8 @@ def main(ctx, config, preference):
 
 
 @main.command()
-@click.argument("project_name")
-@click.argument("path")
+@click.argument("project_name", required=False)
+@click.argument("path", required=False)
 @click.pass_context
 def upload(ctx, project_name, path):
     """
