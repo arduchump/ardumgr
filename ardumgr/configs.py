@@ -148,6 +148,15 @@ class ConfigsMgr(OrderedDict):
         else:
             return super().__getitem__(name)
 
+    def __setitem__(self, key, value):
+        # We only support str type value!
+        if value is None:
+            value = ""
+        else:
+            value = str(value)
+
+        super().__setitem__(key, value)
+
     def __contains__(self, item):
         if self._base:
             if not super().__contains__(item):
