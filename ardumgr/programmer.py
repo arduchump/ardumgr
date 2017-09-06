@@ -69,7 +69,11 @@ class Programmer(object):
 
         # Expand upload tool configs
         upload_tool = self._cfgs["upload.tool"]
-        subtree = self._cfgs.get_subtree("tools.%s" % upload_tool)
+        subtree = self._cfgs.get_tool_subtree(upload_tool)
+        self._cfgs.update(subtree)
+
+        # Expand programmer's configs
+        subtree = self._cfgs.get_subtree("programmers.%s" % self._programmer)
         self._cfgs.update(subtree)
 
     def _generate_upload_pattern(self, build_path, project_name):
