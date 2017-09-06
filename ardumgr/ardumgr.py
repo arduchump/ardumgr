@@ -32,8 +32,7 @@ class ArduMgr(object):
         # run-time configuration available.
         self._cfgs = ConfigsMgr()
         self._cfgs.update(preferences)
-        self._cfgs['runtime.ide.version'] = (
-            version_text.replace('.', '_'))
+        self._cfgs['runtime.ide.version'] = self._version_to_int(version_text)
 
         # Set default target package if target_package not yet specificed
         key = 'target_package'
