@@ -41,12 +41,6 @@ class Programmer(object):
         self._cpu = self._cfgs["ardumgr.cpu"]
         self._serial_port = self._cfgs["ardumgr.serial_port"]
 
-        # Convert preferences to Arduino IDE required format
-        self._cfgs["programmer"] = "arduino:%s" % self._programmer
-        self._cfgs["board"] = self._board
-        self._cfgs["custom_cpu"] = "%s_%s" % (self._board, self._cpu)
-        self._cfgs["serial.port"] = self._serial_port
-
         # Check if cpu related to specfic board
         cpus = platform.get_board_supported_cpus(self._board)
         if cpus:

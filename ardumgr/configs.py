@@ -155,6 +155,28 @@ class ConfigsMgr(OrderedDict):
         else:
             value = str(value)
 
+        # Parse ardumgr settings automatically
+        if key.startswith('ardumgr.'):
+            # Convert preferences to Arduino IDE required format
+            if key == 'ardumgr.home_path':
+                super().__setitem__('runtime.ide.path', value)
+            elif key == 'ardumgr.package':
+                super().__setitem__('target_package', value)
+            elif key == 'ardumgr.programmer':
+                super().__setitem__("programmer", "arduino:%s" % value)
+            elif key == 'ardumgr.board':
+                super().__setitem__("board", value)
+
+                if 'ardumgr.cpu' in self:
+                    super().__setitem__(
+                        "custom_cpu", "%s_%s" % (value, self['ardumgr.cpu']))
+            elif key == 'ardumgr.cpu':
+                if 'ardumgr.board' in self:
+                    super().__setitem__(
+                        "custom_cpu", "%s_%s" % (self['ardumgr.board'], value))
+            elif key == 'ardumgr.serial_port':
+                super().__setitem__("serial.port", value)
+
         super().__setitem__(key, value)
 
     def __contains__(self, item):

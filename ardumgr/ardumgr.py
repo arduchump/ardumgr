@@ -32,10 +32,13 @@ class ArduMgr(object):
         # run-time configuration available.
         self._cfgs = ConfigsMgr()
         self._cfgs.update(preferences)
-        self._cfgs['runtime.ide.path'] = self._home_path
         self._cfgs['runtime.ide.version'] = (
             version_text.replace('.', '_'))
-        self._cfgs['target_package'] = "arduino"
+
+        # Set default target package if target_package not yet specificed
+        key = 'target_package'
+        if key not in self._cfgs:
+            self._cfgs[key] = "arduino"
 
         # Load runtime preferences
         preferences_path = self.user_dir / "preferences.txt"
