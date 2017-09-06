@@ -111,6 +111,19 @@ class ConfigsMgr(OrderedDict):
 
         return subtree
 
+    def get_tool_subtree(self, tool_name):
+        key_prefix = "tools.%s" % tool_name
+        raw_subtree = self.get_subtree(key_prefix)
+        subtree = OrderedDict()
+
+        for k, v in raw_subtree.items():
+            if ".params." in k:
+                k = k.replace(".params.", ".")
+
+            subtree[k] = v
+
+        return subtree
+
     def get_children(self, key_prefix):
         names = []
         key_prefix = key_prefix.replace(".", r"\.")
