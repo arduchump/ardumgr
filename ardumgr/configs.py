@@ -63,18 +63,7 @@ class ConfigsMgr(OrderedDict):
 
                 self["%s%s" % (base_key, option)] = value
 
-    def get_overrided(self, key):
-        runtime_os = self["runtime.os"]
-        runtime_os_specific_key = "%s.%s" % (key, runtime_os)
-
-        try:
-            return self[runtime_os_specific_key]
-        except:
-            return self[key]
-
-    def get_expanded(self, key):
-        text = self.get_overrided(key)
-
+    def expand(self, text):
         while True:
             formatter = string.Formatter()
             has_field = False
@@ -91,6 +80,18 @@ class ConfigsMgr(OrderedDict):
                 return text
 
             text = "".join(snippets)
+
+    def get_overrided(self, key):
+        runtime_os = self["runtime.os"]
+        runtime_os_specific_key = "%s.%s" % (key, runtime_os)
+
+        try:
+            return self[runtime_os_specific_key]
+        except:
+            return self[key]
+
+    def get_expanded(self, key):
+        return self.expand(self.get_overrided(key))
 
     def get_subtree(self, key_prefix):
         subtree = OrderedDict()
