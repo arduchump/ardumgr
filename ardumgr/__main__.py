@@ -36,8 +36,10 @@ def print_table(alist, callback):
 @click.option('-c', '--config', type=click.File('r'), default=None)
 @click.option('-p', '--preference', multiple=True, default=None)
 @click.pass_context
-def cli(ctx, config, preference):
+def main(ctx, config, preference):
     """Console script for ardumgr."""
+
+    ctx.obj = {}
 
     configs = OrderedDict()
     if config:
@@ -66,11 +68,7 @@ def cli(ctx, config, preference):
     ctx.obj["manager"] = manager
 
 
-def main():
-    return cli(obj={})
-
-
-@cli.command()
+@main.command()
 @click.argument("project_name", required=False)
 @click.argument("path", required=False)
 @click.pass_context
@@ -86,7 +84,7 @@ def upload(ctx, project_name, path):
     programmer.upload(path, project_name)
 
 
-@cli.command()
+@main.command()
 @click.argument("path")
 @click.pass_context
 def uploadbin(ctx, path):
@@ -101,7 +99,7 @@ def uploadbin(ctx, path):
     programmer.upload_bin(path)
 
 
-@cli.group()
+@main.group()
 @click.pass_context
 def show(ctx):
     """
